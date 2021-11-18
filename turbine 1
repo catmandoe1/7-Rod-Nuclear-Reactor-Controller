@@ -1,0 +1,158 @@
+local ticksGreater = false
+
+function clamp(input, min, max)
+	if input > max then
+		input = max
+	elseif input < min then
+		input = min
+	end
+	return input
+end
+
+function drawBarMeter(currentVal, max, x, y, width, height)
+	r = 0
+	g = 0
+	b = 0
+	screen.setColor(160, 160, 160)
+	screen.drawRect(x, y, width, height)
+	precent = (currentVal / max) * 100
+	if precent >= 50 and precent < 90 then
+		r = 255
+		g = 255
+		b = 0
+	elseif precent >= 90 then
+		r = 0
+		g = 255
+		b = 0
+	else
+		r = 255
+		g = 0
+		b = 0
+	end
+	screen.setColor(r, g, b)
+	barHeight = (((height - 1) * precent) / 100)
+	if barHeight >= height then
+		barHeight = barHeight - 1
+	end
+	screen.drawRectF(x + 1, y + height - barHeight, width - 1, barHeight)
+end
+
+function drawTurbineStill(x, y, rSet, gSet, bSet)
+	r = clamp(rSet, 0, 255)
+	g = clamp(gSet, 0, 255)
+	b = clamp(bSet, 0, 255)
+	--middle
+	screen.setColor(64, 64, 64)
+	screen.drawRectF(x, y, 3, 3)
+	--top
+	screen.setColor(r, g ,b)
+	screen.drawRectF(x, y - 4, 2, 4)
+	screen.drawRectF(x + 1, y - 5, 3, 2)
+	screen.drawRectF(x + 2, y - 3, 1, 1)
+	--bottom
+	screen.drawRectF(x + 1, y + 3, 2, 4)
+	screen.drawRectF(x - 1, y + 6, 3, 2)
+	screen.drawRectF(x, y + 5, 1, 1)
+	--left
+	screen.drawRectF(x - 4, y + 1, 4, 2)
+	screen.drawRectF(x - 5, y - 1, 2, 3)
+	screen.drawRectF(x - 3, y, 1, 1)
+	--right
+	screen.drawRectF(x + 3, y, 4, 2)
+	screen.drawRectF(x + 6, y + 1, 2, 3)
+	screen.drawRectF(x + 5, y + 2, 1, 1)
+end
+
+function drawTurbineMoving(x, y, rSet, gSet, bSet)
+	r = clamp(rSet, 0, 255)
+	g = clamp(gSet, 0, 255)
+	b = clamp(bSet, 0, 255)	
+	--middle
+	screen.setColor(64, 64, 64)
+	screen.drawRectF(x, y, 3, 3)
+	--top
+	screen.setColor(r, g ,b)
+	screen.drawRectF(x + 3, y - 3, 4, 3)
+	screen.drawRectF(x + 1, y - 1, 2, 1)
+	screen.drawRectF(x + 2, y - 2, 1, 1)
+	screen.drawRectF(x + 7, y - 2, 1, 1)
+	--bottom
+	screen.drawRectF(x, y + 3, 1, 2)
+	screen.drawRectF(x - 4, y + 3, 4, 3)
+	screen.drawRectF(x + 1, y + 3, 1, 1)
+	screen.drawRectF(x - 5, y + 4, 1, 1)
+	--left
+	screen.drawRectF(x - 2, y, 2, 1)
+	screen.drawRectF(x - 1, y + 1, 1, 1)
+	screen.drawRectF(x - 3, y - 4, 3, 4)
+	screen.drawRectF(x - 2, y - 5, 1, 1)
+	--right
+	screen.drawRectF(x + 3, y + 1, 1, 2)
+	screen.drawRectF(x + 4, y + 2, 1, 1)
+	screen.drawRectF(x + 3, y + 3, 3, 4)
+	screen.drawRectF(x + 4, y + 7, 1, 1)
+end
+
+local fan1 = {}	--cnt, switch, rps
+local fan2 = {}
+local fan3 = {}
+local fan4 = {}
+
+function turbineSwitch(fan, maxTicks, maxRpm)
+	if fan["rps"] >= 0 and fan["rps"]  <= 1 then
+		fan["cnt"] = 0 
+	else
+		fan["cnt"] = fan["cnt"] + 1
+	end
+	if fan["rps"]  > maxRpm then
+		fan["rps"]  = maxRpm
+	end
+	ticks = 0.3 * (100 - (fan["rps"]  / maxRpm) * 100)
+	if ticks <= maxTicks then
+		ticks = maxTicks
+		ticksGreater = true
+		output.setBool(1, ticksGreater)
+	else
+		ticksGreater = false
+		output.setBool(1, ticksGreater)
+	end
+
+	if fan["cnt"] > ticks then
+		fan["switch"] = not fan["switch"]
+		fan["cnt"] = 0
+	end
+end
+
+local maxTicks = property.getNumber("Max Switch Speed")
+local maxRpm = property.getNumber("Max Turbine RPS")
+
+function drawTurbineStat(x, y, width, height, fan, rSet, gSet, bSet)
+	r = clamp(rSet, 0, 255)
+	g = clamp(gSet, 0, 255)
+	b = clamp(bSet, 0, 255)
+	if fan["switch"] == false then
+		drawTurbineStill(x, y, r, g, b)
+	else
+		drawTurbineMoving(x, y, r, g, b)
+	end
+	drawBarMeter(fan["rps"], maxRpm, x - 5, y - height - 8, width, height)
+end
+
+function onTick()
+	--drawing turbines
+	fan1["rps"] = (input.getNumber(17)) * 60
+	turbineSwitch(fan1, maxTicks, maxRpm)
+	fan2["rps"] = ((input.getNumber(18)) * 60)
+	turbineSwitch(fan2, maxTicks, maxRpm)
+	fan3["rps"] = ((input.getNumber(19)) * 60)
+	turbineSwitch(fan3, maxTicks, maxRpm)
+	fan4["rps"] = ((input.getNumber(20)) * 60)
+	turbineSwitch(fan4, maxTicks, maxRpm)
+end
+	
+function onDraw()
+	drawTurbineStat(8, 50, 12, 38, fan1, 160, 160, 160)
+	drawTurbineStat(23, 50, 12, 38, fan2, 160, 160, 160)
+	drawTurbineStat(38, 50, 12, 38, fan3, 160, 160, 160)
+	drawTurbineStat(53, 50, 12, 38, fan4, 160, 160, 160)
+end
