@@ -1,0 +1,29 @@
+
+function onTick()
+	turbine1 = string.format("%.1f", input.getNumber(17) * 60)
+	turbine2 = string.format("%.1f", input.getNumber(18) * 60)
+	turbine3 = string.format("%.1f", input.getNumber(19) * 60)
+	turbine4 = string.format("%.1f", input.getNumber(20) * 60)
+end
+
+function onDraw()
+	x = 70
+	width = screen.getWidth()
+	height = screen.getHeight()
+	screen.setColor(16, 16, 16)
+	screen.drawRectF(0, 0, width, height)
+	screen.setColor(32, 32, 32)
+	screen.drawRectF(64, 0, 2, height)
+	screen.setColor(48, 48, 48)
+	screen.drawRectF(66, 0, 1, height)
+	--text
+	screen.setColor(255, 255, 255)
+	screen.drawText(x, 4, "Tur1.")
+	screen.drawText(x, 10, turbine1)
+	screen.drawText(x, 16, "Tur2.")
+	screen.drawText(x, 22, turbine2)
+	screen.drawText(x, 28, "Tur3.")
+	screen.drawText(x, 34, turbine3)
+	screen.drawText(x, 40, "Tur4.")
+	screen.drawText(x, 46, turbine4)
+end
