@@ -140,13 +140,13 @@ end
 
 function onTick()
 	--drawing turbines
-	fan1["rps"] = (input.getNumber(17)) * 60
+	fan1["rps"] = (input.getNumber(23)) * 60
 	turbineSwitch(fan1, maxTicks, maxRpm)
-	fan2["rps"] = ((input.getNumber(18)) * 60)
+	fan2["rps"] = ((input.getNumber(24)) * 60)
 	turbineSwitch(fan2, maxTicks, maxRpm)
-	fan3["rps"] = ((input.getNumber(19)) * 60)
+	fan3["rps"] = ((input.getNumber(25)) * 60)
 	turbineSwitch(fan3, maxTicks, maxRpm)
-	fan4["rps"] = ((input.getNumber(20)) * 60)
+	fan4["rps"] = ((input.getNumber(26)) * 60)
 	turbineSwitch(fan4, maxTicks, maxRpm)
 end
 	
