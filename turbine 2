@@ -1,9 +1,9 @@
 
 function onTick()
-	turbine1 = string.format("%.1f", input.getNumber(17) * 60)
-	turbine2 = string.format("%.1f", input.getNumber(18) * 60)
-	turbine3 = string.format("%.1f", input.getNumber(19) * 60)
-	turbine4 = string.format("%.1f", input.getNumber(20) * 60)
+	turbine1 = string.format("%.1f", input.getNumber(23) * 60)
+	turbine2 = string.format("%.1f", input.getNumber(24) * 60)
+	turbine3 = string.format("%.1f", input.getNumber(25) * 60)
+	turbine4 = string.format("%.1f", input.getNumber(26) * 60)
 end
 
 function onDraw()
@@ -17,7 +17,7 @@ function onDraw()
 	screen.setColor(48, 48, 48)
 	screen.drawRectF(66, 0, 1, height)
 	--text
-	screen.setColor(255, 255, 255)
+	screen.setColor(204, 204, 204)
 	screen.drawText(x, 4, "Tur1.")
 	screen.drawText(x, 10, turbine1)
 	screen.drawText(x, 16, "Tur2.")
